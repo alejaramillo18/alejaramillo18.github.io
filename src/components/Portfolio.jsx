@@ -46,21 +46,27 @@ const PORTFOLIO_DATA = {
     { name: "Power BI", level: 70, category: "Analitica e innovacion tecnologica" },
     { name: "Machine Learning", level: 50, category: "Analitica e innovacion tecnologica" },
   ],
-  // MEDIA: Cada proyecto puede tener image, video, o ambos (thumbnail + video)
-  // Tipos soportados:
-  //   image: "/img/projects/foto.jpg"           → Solo imagen
-  //   video: "/img/projects/video.mp4"           → Solo video
-  //   image + video juntos                       → Thumbnail estático + video al hacer play
-  //   poster: "/img/projects/poster.jpg"         → Poster para el video mientras carga
+  // MEDIA: Cada proyecto soporta múltiples medios en un carrusel.
+  // Usa el campo "gallery" como array. Cada item puede ser:
+  //
+  //   { type: "image", src: "/img/projects/foto.jpg" }
+  //   { type: "video", src: "/video/clip.mp4" }
+  //   { type: "youtube", src: "https://www.youtube.com/embed/VIDEO_ID" }
+  //   { type: "vimeo", src: "https://player.vimeo.com/video/VIDEO_ID" }
+  //   { type: "drive", src: "https://drive.google.com/file/d/FILE_ID/preview" }
+  //
+  // Para videos pesados (+100MB), súbelos a YouTube/Vimeo/Drive y usa el tipo correspondiente.
+  // Los campos "image" y "video" simples siguen funcionando para proyectos con un solo medio.
+  //
   projects: [
     {
       id: 1,
       title: "Motion Graphics",
       category: "AUDIOVISUAL",
       description: "Animación realizada para clase de Taller de Animación. Ilustraciones propias. 2023.",
-      image: null,   // Reemplaza: "/img/projects/project1.jpg"
-      video: "/video/Audiovisual01.mp4",   // Reemplaza: "/img/projects/project1.mp4"
-      poster: null,  // Opcional: thumbnail del video
+      gallery: [
+        { type: "video", src: "/video/Audiovisual01.mp4" },
+      ],
       tags: ["After Effects", "Illustrator", "Storytelling"],
     },
     {
@@ -68,9 +74,12 @@ const PORTFOLIO_DATA = {
       title: "Identidad de Marca",
       category: "DISEÑO",
       description: "Diseño de identidad visual y creación de contenido para redes sociales. 2024.",
-      image: "/img/Diseno12.jpg",
-      video: null,
-      poster: null,
+      gallery: [
+        { type: "image", src: "/img/Diseno12.jpg" },
+        // Agrega más imágenes aquí:
+        // { type: "image", src: "/img/Diseno12b.jpg" },
+        // { type: "image", src: "/img/Diseno12c.jpg" },
+      ],
       tags: ["Illustrator", "Branding", "Tipografía"],
     },
     {
@@ -78,9 +87,9 @@ const PORTFOLIO_DATA = {
       title: "Videojuego Error 403",
       category: "PROGRAMACIÓN",
       description: "Desarrollo de videojuego, ganador del Primer Puesto en las Olimpiadas Tech de Ruta N. 2023.",
-      image: null,
-      video: "/video/Programacion02.mp4",
-      poster: null,
+      gallery: [
+        { type: "video", src: "/video/Programacion02.mp4" },
+      ],
       tags: ["Unity", "C#", "Jugabilidad"],
     },
     {
@@ -88,9 +97,13 @@ const PORTFOLIO_DATA = {
       title: "Simulación de Físicas",
       category: "AUDIOVISUAL",
       description: "Simulación de Pelaje y Tela realizada para clase de Modelamiento y Simulación. 2025.",
-      image: null,
-      video: "/video/Audiovisual02.mp4",
-      poster: null,
+      gallery: [
+        { type: "video", src: "/video/Audiovisual02.mp4" },
+        // Si este es el video pesado (+100MB), cámbialo a:
+        // { type: "youtube", src: "https://www.youtube.com/embed/TU_VIDEO_ID" },
+        // o
+        // { type: "drive", src: "https://drive.google.com/file/d/TU_FILE_ID/preview" },
+      ],
       tags: ["Autodesk Maya", "Arnold Render", "Modelo 3D"],
     },
     {
@@ -98,9 +111,13 @@ const PORTFOLIO_DATA = {
       title: "Diseño de Logotipo",
       category: "DISEÑO",
       description: "Creación de cuatro propuestas de logotipo para una firma jurídica. 2024.",
-      image: "/img/Diseno10.png",
-      video: null,
-      poster: null,
+      gallery: [
+        { type: "image", src: "/img/Diseno10.png" },
+        // Agrega las otras propuestas:
+        // { type: "image", src: "/img/Diseno10b.png" },
+        // { type: "image", src: "/img/Diseno10c.png" },
+        // { type: "image", src: "/img/Diseno10d.png" },
+      ],
       tags: ["Illustrator", "Identidad Visual", "Composición"],
     },
     {
@@ -108,9 +125,9 @@ const PORTFOLIO_DATA = {
       title: "Web Interactiva",
       category: "PROGRAMACIÓN",
       description: "Sitio web con animaciones para clase de Taller de Interactividad. 2025.",
-      image: null,
-      video: "/video/Programacion01.mp4",
-      poster: null,
+      gallery: [
+        { type: "video", src: "/video/Programacion01.mp4" },
+      ],
       tags: ["HTML", "CSS", "After Effects"],
     },
   ],
@@ -238,15 +255,19 @@ function LoadingScreen({ onFinished }) {
   );
 }
 
-// --- Optimized Media (Image/Video with lazy load) ---
-function OptimizedMedia({ image, video, poster, alt, isHovered }) {
+// --- Media Carousel (gallery with images, videos, and embeds) ---
+function MediaCarousel({ gallery, alt, isHovered }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [mediaLoaded, setMediaLoaded] = useState({});
+  const [playingVideo, setPlayingVideo] = useState(null);
   const containerRef = useRef(null);
-  const videoRef = useRef(null);
+  const videoRefs = useRef({});
   const [isInView, setIsInView] = useState(false);
-  const [mediaLoaded, setMediaLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Lazy load: solo carga cuando está cerca del viewport
+  const items = gallery || [];
+  const hasMultiple = items.length > 1;
+
+  // Lazy load
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -255,103 +276,227 @@ function OptimizedMedia({ image, video, poster, alt, isHovered }) {
           observer.disconnect();
         }
       },
-      { rootMargin: "200px" } // Precarga 200px antes de entrar al viewport
+      { rootMargin: "200px" }
     );
     const el = containerRef.current;
     if (el) observer.observe(el);
     return () => { if (el) observer.unobserve(el); };
   }, []);
 
-  const hasMedia = image || video;
-  const showVideo = video && isInView;
-  const showImage = image && isInView && !isPlaying;
+  // Pause video when sliding away
+  useEffect(() => {
+    if (playingVideo !== null && playingVideo !== currentIndex) {
+      const vid = videoRefs.current[playingVideo];
+      if (vid) vid.pause();
+      setPlayingVideo(null);
+    }
+  }, [currentIndex, playingVideo]);
 
-  const handlePlay = (e) => {
+  const goTo = (index, e) => {
+    if (e) e.stopPropagation();
+    setCurrentIndex(index);
+  };
+
+  const goPrev = (e) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        videoRef.current.play();
-        setIsPlaying(true);
-      }
+    setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));
+  };
+
+  const goNext = (e) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleVideoPlay = (index, e) => {
+    e.stopPropagation();
+    const vid = videoRefs.current[index];
+    if (!vid) return;
+    if (playingVideo === index) {
+      vid.pause();
+      setPlayingVideo(null);
+    } else {
+      vid.play();
+      setPlayingVideo(index);
     }
   };
 
-  const handleVideoEnd = () => setIsPlaying(false);
+  const handleVideoEnd = () => setPlayingVideo(null);
 
-  if (!hasMedia) {
-    return null; // No media, will show placeholder in parent
-  }
+  const markLoaded = (index) => {
+    setMediaLoaded((prev) => ({ ...prev, [index]: true }));
+  };
+
+  if (!items.length) return null;
+
+  const isEmbed = (type) => ["youtube", "vimeo", "drive"].includes(type);
 
   return (
-    <div ref={containerRef} className="media-container">
-      {/* Spinner mientras carga */}
-      <div className={`media-placeholder ${mediaLoaded ? "hidden" : ""}`}>
-        <div className="media-spinner" />
-        <span style={{ fontSize: "11px", letterSpacing: "1px" }}>CARGANDO...</span>
-      </div>
+    <div ref={containerRef} className="media-container" style={{ position: "relative", width: "100%", height: "100%" }}>
+      {/* Slides */}
+      {isInView && items.map((item, index) => {
+        const isActive = index === currentIndex;
+        const loaded = mediaLoaded[index];
 
-      {/* Imagen */}
-      {showImage && (
-        <img
-          src={image}
-          alt={alt}
-          loading="lazy"
-          decoding="async"
-          className={mediaLoaded && !video ? "loaded" : "loading"}
-          onLoad={() => { if (!video) setMediaLoaded(true); }}
-          style={{
-            transform: isHovered ? "scale(1.05)" : "scale(1)",
-            position: video ? "absolute" : "relative",
-            inset: video ? 0 : "auto",
-            zIndex: isPlaying ? 0 : 2,
-            opacity: isPlaying ? 0 : 1,
+        return (
+          <div key={index} style={{
+            position: index === 0 ? "relative" : "absolute",
+            inset: 0,
+            opacity: isActive ? 1 : 0,
+            zIndex: isActive ? 2 : 0,
+            transition: "opacity 0.4s ease",
+            pointerEvents: isActive ? "auto" : "none",
+            width: "100%", height: "100%",
+          }}>
+            {/* Loading spinner */}
+            {!loaded && (
+              <div className="media-placeholder">
+                <div className="media-spinner" />
+                <span style={{ fontSize: "11px", letterSpacing: "1px" }}>CARGANDO...</span>
+              </div>
+            )}
+
+            {/* Image */}
+            {item.type === "image" && (
+              <img
+                src={item.src}
+                alt={`${alt} ${index + 1}`}
+                loading="lazy"
+                decoding="async"
+                onLoad={() => markLoaded(index)}
+                style={{
+                  width: "100%", height: "100%", objectFit: "cover",
+                  opacity: loaded ? 1 : 0,
+                  transition: "transform 0.6s, opacity 0.4s",
+                  transform: isHovered && isActive ? "scale(1.05)" : "scale(1)",
+                }}
+              />
+            )}
+
+            {/* Local Video */}
+            {item.type === "video" && (
+              <>
+                <video
+                  ref={(el) => { videoRefs.current[index] = el; }}
+                  src={item.src}
+                  preload="metadata"
+                  playsInline
+                  muted
+                  onLoadedData={() => markLoaded(index)}
+                  onEnded={handleVideoEnd}
+                  style={{
+                    width: "100%", height: "100%", objectFit: "cover",
+                    opacity: loaded ? 1 : 0,
+                    transition: "opacity 0.4s",
+                  }}
+                />
+                {/* Play/Pause overlay */}
+                <div
+                  className={`video-play-btn ${playingVideo === index && !isHovered ? "hidden" : ""}`}
+                  onClick={(e) => handleVideoPlay(index, e)}
+                >
+                  <div className="video-play-icon">
+                    {playingVideo === index ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <polygon points="8,5 19,12 8,19" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Embed (YouTube / Vimeo / Drive) */}
+            {isEmbed(item.type) && (
+              <iframe
+                src={isActive ? item.src : ""}
+                title={`${alt} ${index + 1}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={() => markLoaded(index)}
+                style={{
+                  width: "100%", height: "100%", border: "none",
+                  opacity: loaded ? 1 : 0,
+                  transition: "opacity 0.4s",
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
+
+      {/* Navigation Arrows */}
+      {hasMultiple && isInView && (
+        <>
+          <button onClick={goPrev} style={{
+            position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)",
+            zIndex: 5, width: "36px", height: "36px", borderRadius: "50%",
+            background: "rgba(10, 0, 18, 0.6)", backdropFilter: "blur(8px)",
+            border: "1px solid rgba(123, 63, 191, 0.3)", color: "white",
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "all 0.3s", opacity: isHovered ? 1 : 0,
           }}
-        />
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(123, 63, 191, 0.5)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(10, 0, 18, 0.6)"}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button onClick={goNext} style={{
+            position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)",
+            zIndex: 5, width: "36px", height: "36px", borderRadius: "50%",
+            background: "rgba(10, 0, 18, 0.6)", backdropFilter: "blur(8px)",
+            border: "1px solid rgba(123, 63, 191, 0.3)", color: "white",
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            transition: "all 0.3s", opacity: isHovered ? 1 : 0,
+          }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(123, 63, 191, 0.5)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(10, 0, 18, 0.6)"}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        </>
       )}
 
-      {/* Video */}
-      {showVideo && (
-        <>
-          <video
-            ref={videoRef}
-            src={video}
-            poster={poster || image || undefined}
-            preload="metadata"
-            playsInline
-            muted
-            className={mediaLoaded ? "loaded" : "loading"}
-            onLoadedData={() => setMediaLoaded(true)}
-            onEnded={handleVideoEnd}
-            style={{
-              position: image ? "absolute" : "relative",
-              inset: image ? 0 : "auto",
-              zIndex: isPlaying ? 2 : 1,
-            }}
-          />
+      {/* Dots */}
+      {hasMultiple && isInView && (
+        <div style={{
+          position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)",
+          zIndex: 5, display: "flex", gap: "6px", padding: "6px 12px",
+          borderRadius: "50px", background: "rgba(10, 0, 18, 0.5)", backdropFilter: "blur(8px)",
+        }}>
+          {items.map((_, index) => (
+            <button key={index} onClick={(e) => goTo(index, e)} style={{
+              width: currentIndex === index ? "18px" : "6px",
+              height: "6px", borderRadius: "3px", border: "none", cursor: "pointer",
+              background: currentIndex === index
+                ? "linear-gradient(90deg, var(--purple-light), var(--accent-pink))"
+                : "rgba(255,255,255,0.3)",
+              transition: "all 0.3s", padding: 0,
+            }} />
+          ))}
+        </div>
+      )}
 
-          {/* Play/Pause button */}
-          <div
-            className={`video-play-btn ${isPlaying && !isHovered ? "hidden" : ""}`}
-            onClick={handlePlay}
-            style={{ zIndex: 3 }}
-          >
-            <div className="video-play-icon">
-              {isPlaying ? (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                  <rect x="6" y="4" width="4" height="16" rx="1" />
-                  <rect x="14" y="4" width="4" height="16" rx="1" />
-                </svg>
-              ) : (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                  <polygon points="8,5 19,12 8,19" />
-                </svg>
-              )}
-            </div>
-          </div>
-        </>
+      {/* Media counter badge */}
+      {hasMultiple && isInView && (
+        <span style={{
+          position: "absolute", top: "16px", right: "16px", zIndex: 5,
+          fontSize: "11px", fontWeight: 500, letterSpacing: "0.5px",
+          padding: "4px 10px", borderRadius: "50px",
+          background: "rgba(10, 0, 18, 0.6)", backdropFilter: "blur(8px)",
+          color: "var(--text-secondary)", border: "1px solid rgba(123, 63, 191, 0.2)",
+        }}>
+          {currentIndex + 1} / {items.length}
+        </span>
       )}
     </div>
   );
@@ -790,11 +935,9 @@ function WorkSection() {
                 aspectRatio: "16/10", background: "linear-gradient(135deg, var(--purple-deep), var(--bg-card-hover))",
                 display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
               }}>
-                {(project.image || project.video) ? (
-                  <OptimizedMedia
-                    image={project.image}
-                    video={project.video}
-                    poster={project.poster}
+                {(project.gallery && project.gallery.length > 0) ? (
+                  <MediaCarousel
+                    gallery={project.gallery}
                     alt={project.title}
                     isHovered={hoveredId === project.id}
                   />
