@@ -29,6 +29,7 @@ const PORTFOLIO_DATA = {
     { name: "Unreal Engine", level: 80, category: "desarrollo y programacion" },
 
     { name: "Figma", level: 100, category: "Diseño y produccion digital" },
+    { name: "Genially", level: 100, category: "Diseño y produccion digital" },
     { name: "Adobe Illustrator", level: 100, category: "Diseño y produccion digital" },
     { name: "Adobe Photoshop", level: 100, category: "Diseño y produccion digital" },
     { name: "Adobe Premiere Pro", level: 100, category: "Diseño y produccion digital" },
@@ -54,63 +55,63 @@ const PORTFOLIO_DATA = {
   projects: [
     {
       id: 1,
-      title: "Proyecto Audiovisual",
+      title: "Motion Graphics",
       category: "AUDIOVISUAL",
-      description: "Producción audiovisual completa con narrativa visual impactante.",
+      description: "Animación realizada para clase de Taller de Animación. Ilustraciones propias. 2023.",
       image: null,   // Reemplaza: "/img/projects/project1.jpg"
-      video: null,   // Reemplaza: "/img/projects/project1.mp4"
+      video: "/video/Audiovisual01.mp4",   // Reemplaza: "/img/projects/project1.mp4"
       poster: null,  // Opcional: thumbnail del video
-      tags: ["After Effects", "Premiere Pro", "Storytelling"],
+      tags: ["After Effects", "Illustrator", "Storytelling"],
     },
     {
       id: 2,
       title: "Identidad de Marca",
       category: "DISEÑO",
-      description: "Diseño de identidad visual para marca emergente.",
-      image: null,
+      description: "Diseño de identidad visual y creación de contenido para redes sociales. 2024.",
+      image: "/img/Diseno12.jpg",
       video: null,
       poster: null,
       tags: ["Illustrator", "Branding", "Tipografía"],
     },
     {
       id: 3,
-      title: "App Interactiva",
+      title: "Videojuego Error 403",
       category: "PROGRAMACIÓN",
-      description: "Desarrollo de experiencia interactiva multimedia.",
+      description: "Desarrollo de videojuego, ganador del Primer Puesto en las Olimpiadas Tech de Ruta N. 2023.",
       image: null,
-      video: null,
+      video: "/video/Programacion02.mp4",
       poster: null,
-      tags: ["React", "JavaScript", "UI/UX"],
+      tags: ["Unity", "C#", "Jugabilidad"],
     },
     {
       id: 4,
-      title: "Motion Graphics",
+      title: "Simulación de Físicas",
       category: "AUDIOVISUAL",
-      description: "Animaciones y motion graphics para redes sociales.",
+      description: "Simulación de Pelaje y Tela realizada para clase de Modelamiento y Simulación. 2025.",
       image: null,
-      video: null,
+      video: "/video/Audiovisual02.mp4",
       poster: null,
-      tags: ["After Effects", "Lottie", "Animación"],
+      tags: ["Autodesk Maya", "Arnold Render", "Modelo 3D"],
     },
     {
       id: 5,
-      title: "Ilustración Digital",
+      title: "Diseño de Logotipo",
       category: "DISEÑO",
-      description: "Serie de ilustraciones digitales con estilo propio.",
-      image: null,
+      description: "Creación de cuatro propuestas de logotipo para una firma jurídica. 2024.",
+      image: "/img/Diseno10.png",
       video: null,
       poster: null,
-      tags: ["Photoshop", "Ilustración", "Arte Digital"],
+      tags: ["Illustrator", "Identidad Visual", "Composición"],
     },
     {
       id: 6,
       title: "Web Interactiva",
       category: "PROGRAMACIÓN",
-      description: "Sitio web con animaciones y experiencias inmersivas.",
+      description: "Sitio web con animaciones para clase de Taller de Interactividad. 2025.",
       image: null,
-      video: null,
+      video: "/video/Programacion01.mp4",
       poster: null,
-      tags: ["Three.js", "GSAP", "WebGL"],
+      tags: ["HTML", "CSS", "After Effects"],
     },
   ],
   process: [
@@ -540,7 +541,7 @@ function HeroSection() {
             background: "linear-gradient(135deg, var(--purple-light), var(--accent-pink))",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
           }}>
-            <img src="img/Ale01.jpeg" style={{ width: "105%", height: "105%", objectFit: "cover", borderRadius: "50%" }} />
+            <img src="img/Ale01.jpeg" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
           </span>
           <div style={{
             position: "absolute", inset: "-2px", borderRadius: "50%",
@@ -630,7 +631,7 @@ function AboutSection() {
           }}>
             {/* REEMPLAZA con: <img src="/img/profile.png" style={{width:"100%",height:"100%",objectFit:"cover"}} alt="Aleja" /> */}
             <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
-              <div style={{ marginBottom: "12px" }}>
+              <div>
                 <img src="img/Ale02.jpeg" style={{ width: "100%", height: "100%" }} />
               </div>
             </div>
