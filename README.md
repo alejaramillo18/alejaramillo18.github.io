@@ -10,7 +10,7 @@
 
 **Portafolio personal de diseño multimedia, motion graphics y desarrollo creativo.**
 
-[🔗 Ver sitio en vivo](https://tu-usuario.github.io/portfolio/) · [📬 Contacto](#-contacto)
+[🔗 Ver sitio en vivo](https://alejaramillo18.github.io/portfolio/) · [📬 Contacto](#-contacto)
 
 </div>
 
@@ -149,109 +149,6 @@ Los archivos optimizados se generan en la carpeta `dist/`.
 ```bash
 npm run preview
 ```
-
----
-
-## 🌐 Deploy en GitHub Pages
-
-### Configurar
-
-En `vite.config.js`, ajusta el campo `base` al nombre de tu repositorio:
-
-```js
-base: '/nombre-de-tu-repo/'
-```
-
-> Si usas `tu-usuario.github.io` como repositorio, usa `base: '/'`
-
-### Desplegar
-
-```bash
-npm run deploy
-```
-
-Esto ejecuta `vite build` y publica la carpeta `dist/` en la rama `gh-pages` automáticamente.
-
----
-
-## ✏️ Personalización
-
-Toda la información del portafolio se edita desde un único lugar: el objeto `PORTFOLIO_DATA` al inicio de `src/components/Portfolio.jsx`.
-
-```js
-const PORTFOLIO_DATA = {
-  name: "Tu Nombre",
-  tagline: "Tu descripción corta",
-  bio: "Tu biografía...",
-  email: "tu@email.com",
-  social: {
-    instagram: "https://...",
-    tiktok: "https://...",
-    linkedin: "https://...",
-  },
-  skills: [
-    { name: "Herramienta", level: 85, category: "design" },
-    // categorías: "design" | "motion" | "3d" | "dev"
-  ],
-  projects: [
-    {
-      id: 1,
-      title: "Nombre del proyecto",
-      category: "DISEÑO",              // "AUDIOVISUAL" | "DISEÑO" | "PROGRAMACIÓN"
-      description: "Descripción corta",
-      image: "/img/projects/foto.jpg",  // o null para mostrar placeholder
-      tags: ["Tag1", "Tag2"],
-    },
-  ],
-  process: [
-    { step: "01", title: "Paso", description: "...", icon: "🔍" },
-  ],
-};
-```
-
-### Agregar imágenes
-
-Coloca tus archivos en `public/img/` y referéncialos con ruta absoluta:
-
-```js
-image: "/img/projects/mi-proyecto.jpg"
-```
-
-### Integrar animaciones Lottie
-
-Para usar archivos `.json` exportados desde After Effects con Bodymovin:
-
-```bash
-npm install lottie-react
-```
-
-```jsx
-import Lottie from 'lottie-react';
-import miAnimacion from '/anim/miAnimacion.json';
-
-<Lottie animationData={miAnimacion} loop={true} style={{ width: 200 }} />
-```
-
----
-
-## 📸 Preview
-
-> *Agrega aquí capturas de pantalla de tu sitio una vez esté listo.*
->
-> Puedes usar la siguiente estructura:
->
-> ```md
-> ![Hero](./screenshots/hero.png)
-> ![Proyectos](./screenshots/projects.png)
-> ![Mobile](./screenshots/mobile.png)
-> ```
-
----
-
-## 📄 Licencia
-
-Este proyecto es de uso personal. Si deseas usarlo como base para tu propio portafolio, eres libre de hacerlo dando el crédito correspondiente.
-
 ---
 
 ## 📬 Contacto
