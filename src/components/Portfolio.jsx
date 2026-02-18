@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 // ==================== CONFIGURATION ====================
 // Edita estos datos para personalizar tu portafolio
@@ -26,13 +26,21 @@ const PORTFOLIO_DATA = {
     { name: "JavaScript", level: 65, category: "dev" },
     { name: "React", level: 60, category: "dev" },
   ],
+  // MEDIA: Cada proyecto puede tener image, video, o ambos (thumbnail + video)
+  // Tipos soportados:
+  //   image: "/img/projects/foto.jpg"           → Solo imagen
+  //   video: "/img/projects/video.mp4"           → Solo video
+  //   image + video juntos                       → Thumbnail estático + video al hacer play
+  //   poster: "/img/projects/poster.jpg"         → Poster para el video mientras carga
   projects: [
     {
       id: 1,
       title: "Proyecto Audiovisual",
       category: "AUDIOVISUAL",
       description: "Producción audiovisual completa con narrativa visual impactante.",
-      image: null, // Reemplaza con: "/img/projects/project1.jpg"
+      image: null,   // Reemplaza: "/img/projects/project1.jpg"
+      video: null,   // Reemplaza: "/img/projects/project1.mp4"
+      poster: null,  // Opcional: thumbnail del video
       tags: ["After Effects", "Premiere Pro", "Storytelling"],
     },
     {
@@ -41,6 +49,8 @@ const PORTFOLIO_DATA = {
       category: "DISEÑO",
       description: "Diseño de identidad visual para marca emergente.",
       image: null,
+      video: null,
+      poster: null,
       tags: ["Illustrator", "Branding", "Tipografía"],
     },
     {
@@ -49,6 +59,8 @@ const PORTFOLIO_DATA = {
       category: "PROGRAMACIÓN",
       description: "Desarrollo de experiencia interactiva multimedia.",
       image: null,
+      video: null,
+      poster: null,
       tags: ["React", "JavaScript", "UI/UX"],
     },
     {
@@ -57,6 +69,8 @@ const PORTFOLIO_DATA = {
       category: "AUDIOVISUAL",
       description: "Animaciones y motion graphics para redes sociales.",
       image: null,
+      video: null,
+      poster: null,
       tags: ["After Effects", "Lottie", "Animación"],
     },
     {
@@ -65,6 +79,8 @@ const PORTFOLIO_DATA = {
       category: "DISEÑO",
       description: "Serie de ilustraciones digitales con estilo propio.",
       image: null,
+      video: null,
+      poster: null,
       tags: ["Photoshop", "Ilustración", "Arte Digital"],
     },
     {
@@ -73,6 +89,8 @@ const PORTFOLIO_DATA = {
       category: "PROGRAMACIÓN",
       description: "Sitio web con animaciones y experiencias inmersivas.",
       image: null,
+      video: null,
+      poster: null,
       tags: ["Three.js", "GSAP", "WebGL"],
     },
   ],
@@ -144,6 +162,180 @@ function useParallax() {
 }
 
 // ==================== COMPONENTS ====================
+
+// --- Loading Screen ---
+function LoadingScreen({ onFinished }) {
+  const [progress, setProgress] = useState(0);
+  const [hidden, setHidden] = useState(false);
+
+  useEffect(() => {
+    // Simula carga progresiva + espera fuentes
+    const steps = [
+      { target: 30, delay: 200 },
+      { target: 55, delay: 500 },
+      { target: 75, delay: 800 },
+      { target: 90, delay: 1200 },
+    ];
+
+    const timers = steps.map(({ target, delay }) =>
+      setTimeout(() => setProgress(target), delay)
+    );
+
+    // Espera a que las fuentes estén cargadas
+    const fontsReady = document.fonts?.ready || Promise.resolve();
+    fontsReady.then(() => {
+      setTimeout(() => {
+        setProgress(100);
+        setTimeout(() => {
+          setHidden(true);
+          setTimeout(() => onFinished(), 600);
+        }, 400);
+      }, 1500);
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [onFinished]);
+
+  return (
+    <div className={`loading-screen ${hidden ? "hidden" : ""}`}>
+      {/* Rings decorativos */}
+      <div className="loader-ring" />
+      <div className="loader-ring-2" />
+
+      {/* Logo */}
+      <div className="loader-logo">AJ</div>
+
+      {/* Barra de progreso */}
+      <div className="loader-bar-track">
+        <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
+      </div>
+
+      {/* Texto */}
+      <span className="loader-text">
+        {progress < 100 ? "CARGANDO PORTAFOLIO..." : "¡LISTO!"}
+      </span>
+    </div>
+  );
+}
+
+// --- Optimized Media (Image/Video with lazy load) ---
+function OptimizedMedia({ image, video, poster, alt, isHovered }) {
+  const containerRef = useRef(null);
+  const videoRef = useRef(null);
+  const [isInView, setIsInView] = useState(false);
+  const [mediaLoaded, setMediaLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Lazy load: solo carga cuando está cerca del viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" } // Precarga 200px antes de entrar al viewport
+    );
+    const el = containerRef.current;
+    if (el) observer.observe(el);
+    return () => { if (el) observer.unobserve(el); };
+  }, []);
+
+  const hasMedia = image || video;
+  const showVideo = video && isInView;
+  const showImage = image && isInView && !isPlaying;
+
+  const handlePlay = (e) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  const handleVideoEnd = () => setIsPlaying(false);
+
+  if (!hasMedia) {
+    return null; // No media, will show placeholder in parent
+  }
+
+  return (
+    <div ref={containerRef} className="media-container">
+      {/* Spinner mientras carga */}
+      <div className={`media-placeholder ${mediaLoaded ? "hidden" : ""}`}>
+        <div className="media-spinner" />
+        <span style={{ fontSize: "11px", letterSpacing: "1px" }}>CARGANDO...</span>
+      </div>
+
+      {/* Imagen */}
+      {showImage && (
+        <img
+          src={image}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          className={mediaLoaded && !video ? "loaded" : "loading"}
+          onLoad={() => { if (!video) setMediaLoaded(true); }}
+          style={{
+            transform: isHovered ? "scale(1.05)" : "scale(1)",
+            position: video ? "absolute" : "relative",
+            inset: video ? 0 : "auto",
+            zIndex: isPlaying ? 0 : 2,
+            opacity: isPlaying ? 0 : 1,
+          }}
+        />
+      )}
+
+      {/* Video */}
+      {showVideo && (
+        <>
+          <video
+            ref={videoRef}
+            src={video}
+            poster={poster || image || undefined}
+            preload="metadata"
+            playsInline
+            muted
+            className={mediaLoaded ? "loaded" : "loading"}
+            onLoadedData={() => setMediaLoaded(true)}
+            onEnded={handleVideoEnd}
+            style={{
+              position: image ? "absolute" : "relative",
+              inset: image ? 0 : "auto",
+              zIndex: isPlaying ? 2 : 1,
+            }}
+          />
+
+          {/* Play/Pause button */}
+          <div
+            className={`video-play-btn ${isPlaying && !isHovered ? "hidden" : ""}`}
+            onClick={handlePlay}
+            style={{ zIndex: 3 }}
+          >
+            <div className="video-play-icon">
+              {isPlaying ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <polygon points="8,5 19,12 8,19" />
+                </svg>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function CursorGlow() {
   const [pos, setPos] = useState({ x: -200, y: -200 });
@@ -418,7 +610,6 @@ function AboutSection() {
             {/* REEMPLAZA con: <img src="/img/profile.png" style={{width:"100%",height:"100%",objectFit:"cover"}} alt="Aleja" /> */}
             <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
               <div style={{ fontSize: "48px", marginBottom: "12px" }}>📷</div>
-              <span style={{ fontSize: "13px", letterSpacing: "1px" }}>TU FOTO AQUÍ</span>
             </div>
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to top, var(--bg-secondary), transparent)" }} />
           </div>
@@ -574,11 +765,14 @@ function WorkSection() {
                 aspectRatio: "16/10", background: "linear-gradient(135deg, var(--purple-deep), var(--bg-card-hover))",
                 display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
               }}>
-                {project.image ? (
-                  <img src={project.image} alt={project.title} style={{
-                    width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.6s",
-                    transform: hoveredId === project.id ? "scale(1.05)" : "scale(1)",
-                  }} />
+                {(project.image || project.video) ? (
+                  <OptimizedMedia
+                    image={project.image}
+                    video={project.video}
+                    poster={project.poster}
+                    alt={project.title}
+                    isHovered={hoveredId === project.id}
+                  />
                 ) : (
                   <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
                     <div style={{ fontSize: "36px", marginBottom: "8px", transition: "transform 0.4s", transform: hoveredId === project.id ? "scale(1.15)" : "scale(1)" }}>
@@ -709,6 +903,8 @@ function ContactSection() {
 // ==================== MAIN ====================
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("hero");
+  const [isLoading, setIsLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     const sections = ["hero", "about", "skills", "work", "process", "contact"];
@@ -727,17 +923,32 @@ export default function Portfolio() {
     return () => observer.disconnect();
   }, []);
 
+  const handleLoadingFinished = useCallback(() => {
+    setIsLoading(false);
+    // Pequeño delay para que el contenido aparezca suavemente
+    setTimeout(() => setShowContent(true), 50);
+  }, []);
+
   return (
     <>
-      <div className="grain-overlay" />
-      <CursorGlow />
-      <Navigation activeSection={activeSection} />
-      <HeroSection />
-      <AboutSection />
-      <SkillsSection />
-      <WorkSection />
-      <ProcessSection />
-      <ContactSection />
+      {/* Loading Screen */}
+      {isLoading && <LoadingScreen onFinished={handleLoadingFinished} />}
+
+      {/* Main Content */}
+      <div style={{
+        opacity: showContent ? 1 : 0,
+        transition: "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)",
+      }}>
+        <div className="grain-overlay" />
+        <CursorGlow />
+        <Navigation activeSection={activeSection} />
+        <HeroSection />
+        <AboutSection />
+        <SkillsSection />
+        <WorkSection />
+        <ProcessSection />
+        <ContactSection />
+      </div>
     </>
   );
 }

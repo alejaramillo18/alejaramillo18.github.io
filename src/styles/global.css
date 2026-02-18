@@ -143,6 +143,193 @@ body {
   }
 }
 
+/* ===== LOADING SCREEN ===== */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loader-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--purple-light), var(--accent-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 40px;
+  animation: scale-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.loader-bar-track {
+  width: 200px;
+  height: 3px;
+  background: rgba(123, 63, 191, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.loader-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--purple-main), var(--accent-pink), var(--accent-cyan));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.loader-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.loader-ring {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 1px solid rgba(123, 63, 191, 0.1);
+  animation: rotate-slow 8s linear infinite;
+}
+
+.loader-ring::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--purple-light);
+  box-shadow: 0 0 12px var(--purple-light);
+}
+
+.loader-ring-2 {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 90, 176, 0.06);
+  animation: rotate-slow 12s linear infinite reverse;
+}
+
+/* ===== OPTIMIZED MEDIA ===== */
+.media-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--purple-deep), var(--bg-card-hover));
+}
+
+.media-container img,
+.media-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+}
+
+.media-container img.loading,
+.media-container video.loading {
+  opacity: 0;
+}
+
+.media-container img.loaded,
+.media-container video.loaded {
+  opacity: 1;
+}
+
+.media-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  transition: opacity 0.4s;
+}
+
+.media-placeholder.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.media-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(123, 63, 191, 0.15);
+  border-top-color: var(--purple-light);
+  border-radius: 50%;
+  animation: rotate-slow 0.8s linear infinite;
+}
+
+.video-play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 0, 18, 0.3);
+  opacity: 1;
+  transition: opacity 0.3s;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.video-play-btn:hover {
+  background: rgba(10, 0, 18, 0.15);
+}
+
+.video-play-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-play-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(123, 63, 191, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, background 0.3s;
+  box-shadow: 0 8px 32px rgba(123, 63, 191, 0.3);
+}
+
+.video-play-btn:hover .video-play-icon {
+  transform: scale(1.1);
+  background: rgba(169, 110, 232, 0.9);
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .section {
