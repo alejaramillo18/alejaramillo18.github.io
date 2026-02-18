@@ -539,7 +539,9 @@ function HeroSection() {
             fontFamily: "'Syne', sans-serif", fontSize: "48px", fontWeight: 800,
             background: "linear-gradient(135deg, var(--purple-light), var(--accent-pink))",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          }}>AJ</span>
+          }}>
+            <img src="img/Ale01.jpeg" style={{ width: "105%", height: "105%", objectFit: "cover", borderRadius: "50%" }} />
+          </span>
           <div style={{
             position: "absolute", inset: "-2px", borderRadius: "50%",
             border: "2px solid transparent", borderTopColor: "var(--purple-light)",
@@ -628,7 +630,9 @@ function AboutSection() {
           }}>
             {/* REEMPLAZA con: <img src="/img/profile.png" style={{width:"100%",height:"100%",objectFit:"cover"}} alt="Aleja" /> */}
             <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
-              <div style={{ fontSize: "48px", marginBottom: "12px" }}>📷</div>
+              <div style={{ marginBottom: "12px" }}>
+                <img src="img/Ale02.jpeg" style={{ width: "100%", height: "100%" }} />
+              </div>
             </div>
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "40%", background: "linear-gradient(to top, var(--bg-secondary), transparent)" }} />
           </div>
@@ -665,7 +669,9 @@ function AboutSection() {
                 width: "60px", height: "60px", borderRadius: "50%", background: "var(--bg-card)",
                 border: "1px solid rgba(232, 90, 176, 0.2)", display: "flex", alignItems: "center",
                 justifyContent: "center", flexShrink: 0, fontSize: "28px",
-              }}>🐱</div>
+              }}>
+                <img src="img/Julieta.jpeg" style={{ width: "120%", height: "120%", borderRadius: "50%" }} />
+              </div>
               <div>
                 <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "15px", color: "var(--accent-pink)" }}>Meet Julieta</span>
                 <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.5, marginTop: "4px" }}>
