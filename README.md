@@ -10,7 +10,7 @@
 
 **Portafolio personal de diseño multimedia, motion graphics y desarrollo creativo.**
 
-[🔗 Ver sitio en vivo](https://alejaramillo18.github.io/portfolio/) · [📬 Contacto](#-contacto)
+[🔗 Ver sitio en vivo](https://alejaramillo18.github.io/) · [📬 Contacto](#-contacto)
 
 </div>
 
