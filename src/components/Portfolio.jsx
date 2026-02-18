@@ -9,7 +9,7 @@ const PORTFOLIO_DATA = {
   Desde pequeña, me han caracterizado la creatividad, la empatía, la versatilidad 
   y la autenticidad. Me apasiona contar historias y dar vida a personajes que cautiven 
   y dejen huella en los demás.`,
-  email: "tu-email@example.com",
+  email: "majh011803@gmail.com",
   social: {
     instagram: "https://www.instagram.com/hanamanzana",
     tiktok: "https://www.tiktok.com/@hanamanzana",
