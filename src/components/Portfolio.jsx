@@ -4,11 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // Edita estos datos para personalizar tu portafolio
 const PORTFOLIO_DATA = {
   name: "Aleja Jaramillo",
-  tagline: "Diseñadora Multimedia & Creadora Visual",
-  bio: `Soy Maria Alejandra Jaramillo Hernández, estudiante de Ingeniería Multimedia. 
+  tagline: "Ingeniera Multimedia y Creadora Audiovisual",
+  bio: `Soy Maria Alejandra Jaramillo Hernández, Ingeniera Multimedia. 
   Desde pequeña, me han caracterizado la creatividad, la empatía, la versatilidad 
-  y la autenticidad. Me apasiona contar historias y dar vida a personajes que cautiven 
-  y dejen huella en los demás.`,
+  y la autenticidad. Me apasiona crear y desarrollar productos que cautiven 
+  y dejen huella en los demás. Disfruto aprender y explorar nuevas experiencias,
+  siempre en sintonía con la evolución constante del mundo.`,
   email: "majh011803@gmail.com",
   social: {
     instagram: "https://www.instagram.com/hanamanzana",
@@ -16,15 +17,33 @@ const PORTFOLIO_DATA = {
     linkedin: "https://www.linkedin.com/in/maria-alejandra-jaramillo-hern%C3%A1ndez-998b84338/",
   },
   skills: [
-    { name: "After Effects", level: 90, category: "motion" },
-    { name: "Illustrator", level: 85, category: "design" },
-    { name: "Photoshop", level: 88, category: "design" },
-    { name: "Premiere Pro", level: 82, category: "motion" },
-    { name: "Blender", level: 70, category: "3d" },
-    { name: "Figma", level: 80, category: "design" },
-    { name: "HTML/CSS", level: 75, category: "dev" },
-    { name: "JavaScript", level: 65, category: "dev" },
-    { name: "React", level: 60, category: "dev" },
+    { name: "JavaScript", level: 70, category: "desarrollo y programacion" },
+    { name: "Python", level: 70, category: "desarrollo y programacion" },
+    { name: "C#", level: 80, category: "desarrollo y programacion" },
+    { name: "WordPress", level: 65, category: "desarrollo y programacion" },
+    { name: "HTML", level: 90, category: "desarrollo y programacion" },
+    { name: "CSS", level: 90, category: "desarrollo y programacion" },
+    { name: "React", level: 70, category: "desarrollo y programacion" },
+    { name: "Vite", level: 60, category: "desarrollo y programacion" },
+    { name: "Unity", level: 100, category: "desarrollo y programacion" },
+    { name: "Unreal Engine", level: 80, category: "desarrollo y programacion" },
+
+    { name: "Figma", level: 100, category: "Diseño y produccion digital" },
+    { name: "Adobe Illustrator", level: 100, category: "Diseño y produccion digital" },
+    { name: "Adobe Photoshop", level: 100, category: "Diseño y produccion digital" },
+    { name: "Adobe Premiere Pro", level: 100, category: "Diseño y produccion digital" },
+    { name: "Adobe After Effects", level: 100, category: "Diseño y produccion digital" },
+    { name: "Adobe Lightroom", level: 100, category: "Diseño y produccion digital" },
+    { name: "Canva", level: 100, category: "Diseño y produccion digital" },
+    { name: "Davinci Resolve", level: 100, category: "Diseño y produccion digital" },
+    { name: "Pro Tools", level: 80, category: "Diseño y produccion digital" },
+    { name: "Reaper", level: 80, category: "Diseño y produccion digital" },
+    { name: "Autodesk Maya", level: 100, category: "Diseño y produccion digital" },
+    { name: "Blender", level: 85, category: "Diseño y produccion digital" },
+
+    { name: "SQL", level: 75, category: "Analitica e innovacion tecnologica" },
+    { name: "Power BI", level: 70, category: "Analitica e innovacion tecnologica" },
+    { name: "Machine Learning", level: 50, category: "Analitica e innovacion tecnologica" },
   ],
   // MEDIA: Cada proyecto puede tener image, video, o ambos (thumbnail + video)
   // Tipos soportados:
@@ -360,7 +379,7 @@ function Navigation({ activeSection }) {
 
   const navItems = [
     { id: "hero", label: "Inicio" },
-    { id: "about", label: "Sobre Mí" },
+    { id: "about", label: "Sobre Mi" },
     { id: "skills", label: "Skills" },
     { id: "work", label: "Trabajo" },
     { id: "process", label: "Proceso" },
@@ -597,7 +616,7 @@ function AboutSection() {
   return (
     <section id="about" className="section" style={{ background: "linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%)" }}>
       <div className="section-inner">
-        <SectionTitle label="Conóceme" title="Sobre Mí" />
+        <SectionTitle label="Conóceme" title="Sobre Mi" />
         <div ref={ref} className="about-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "60px", alignItems: "center" }}>
           {/* Photo placeholder */}
           <div className={`reveal about-photo ${isVisible ? "visible" : ""}`} style={{
@@ -621,9 +640,9 @@ function AboutSection() {
 
             <div className={`reveal reveal-delay-3 info-grid ${isVisible ? "visible" : ""}`} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
               {[
-                { label: "Enfoque", value: "Diseño & Multimedia" },
-                { label: "Ubicación", value: "Colombia" },
-                { label: "Estudio", value: "Ing. Multimedia" },
+                { label: "Enfoque", value: "Desarrollo y Multimedia" },
+                { label: "Ubicación", value: "Medellín, Colombia" },
+                { label: "Estudio", value: "Ingeniería Multimedia" },
                 { label: "Pasión", value: "Storytelling Visual" },
               ].map((item, i) => (
                 <div key={i} style={{
@@ -650,7 +669,7 @@ function AboutSection() {
               <div>
                 <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "15px", color: "var(--accent-pink)" }}>Meet Julieta</span>
                 <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.5, marginTop: "4px" }}>
-                  Mi gata calicó, fuente inagotable de inspiración y compañera inseparable.
+                  Mi gata calicó, fuente inagotable de inspiración y compañera inseparable. En ella encuentro el ejemplo perfecto de la conexión y el impacto que deseo generar en los demás con mi trabajo.
                 </p>
               </div>
             </div>
@@ -668,10 +687,9 @@ function SkillsSection() {
 
   const categories = [
     { id: "all", label: "Todos" },
-    { id: "design", label: "Diseño" },
-    { id: "motion", label: "Motion" },
-    { id: "3d", label: "3D" },
-    { id: "dev", label: "Desarrollo" },
+    { id: "desarrollo y programacion", label: "Desarrollo y Programación" },
+    { id: "Diseño y produccion digital", label: "Diseño y Producción Digital" },
+    { id: "Analitica e innovacion tecnologica", label: "Analítica e Innovación Tecnológica" },
   ];
 
   const filtered = activeFilter === "all"
