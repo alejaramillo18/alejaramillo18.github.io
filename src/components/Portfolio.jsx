@@ -76,9 +76,9 @@ const PORTFOLIO_DATA = {
       description: "Diseño de identidad visual y creación de contenido para redes sociales. 2024.",
       gallery: [
         { type: "image", src: "/img/Diseno12.jpg" },
-        // Agrega más imágenes aquí:
-        // { type: "image", src: "/img/Diseno12b.jpg" },
-        // { type: "image", src: "/img/Diseno12c.jpg" },
+        { type: "image", src: "/img/Diseno13.jpg" },
+        { type: "image", src: "/img/Diseno14.jpg" },
+        { type: "image", src: "/img/Diseno15.jpg" },
       ],
       tags: ["Illustrator", "Branding", "Tipografía"],
     },
@@ -112,11 +112,10 @@ const PORTFOLIO_DATA = {
       category: "DISEÑO",
       description: "Creación de cuatro propuestas de logotipo para una firma jurídica. 2024.",
       gallery: [
+        { type: "image", src: "/img/Diseno08.png" },
+        { type: "image", src: "/img/Diseno09.png" },
         { type: "image", src: "/img/Diseno10.png" },
-        // Agrega las otras propuestas:
-        // { type: "image", src: "/img/Diseno10b.png" },
-        // { type: "image", src: "/img/Diseno10c.png" },
-        // { type: "image", src: "/img/Diseno10d.png" },
+        { type: "image", src: "/img/Diseno11.png" },
       ],
       tags: ["Illustrator", "Identidad Visual", "Composición"],
     },
@@ -129,6 +128,104 @@ const PORTFOLIO_DATA = {
         { type: "video", src: "/video/Programacion01.mp4" },
       ],
       tags: ["HTML", "CSS", "After Effects"],
+    },
+    {
+      id: 7,
+      title: "Video Lyrics",
+      category: "AUDIOVISUAL",
+      description: "Producción de dos Videos Lyrics Oficiales para la banda ANTIKA. 2024.",
+      gallery: [
+        { type: "youtube", src: "https://www.youtube.com/embed/x4GbrhQmjQs?si=v3ehdcPu8z_GeSz8" },
+        { type: "youtube", src: "https://www.youtube.com/embed/P0f9Yg7ZByc?si=1ZGgDseEO5u82s9p" },
+      ],
+      tags: ["After Effects", "Premiere Pro", "Illustrator"],
+    },
+    {
+      id: 8,
+      title: "Diseño de Personaje e Historia Original",
+      category: "DISEÑO",
+      description: "Ilustraciones, Poster y Comic para el videojuego Error 403, ganador del Primer Puesto en las Olimpiadas Tech de Ruta N. 2023.",
+      gallery: [
+        { type: "image", src: "/img/Diseno01.jpg" },
+        { type: "image", src: "/img/Diseno23.jpg" },
+        { type: "image", src: "/img/Diseno03.jpg" },
+        { type: "image", src: "/img/Diseno04.jpg" },
+      ],
+      tags: ["Illustrator", "IbisPaint X", "Storytelling"],
+    },
+    {
+      id: 9,
+      title: "Web Doodle",
+      category: "PROGRAMACIÓN",
+      description: "Doodle con animaciones para clase de Taller de Interactividad. 2025.",
+      gallery: [
+        { type: "video", src: "/video/Programacion04.mp4" },
+      ],
+      tags: ["HTML", "CSS", "JavaScript"],
+    },
+    {
+      id: 10,
+      title: "VFX Video Musical",
+      category: "AUDIOVISUAL",
+      description: "Producción de Efectos Especiales para Video Musical Oficial. 2024.",
+      gallery: [
+        { type: "youtube", src: "https://www.youtube.com/embed/Cx6DIJhQucc?si=6HklaAb-F0pD9xy0" },
+      ],
+      tags: ["After Effects", "Premiere Pro", "Plugins"],
+    },
+    {
+      id: 11,
+      title: "Modelado y Texturizado 3D",
+      category: "DISEÑO",
+      description: "Creación de modelos 3D con aplicación de texturas y materiales para lograr acabados realistas y coherentes con el concepto visual del proyecto. 2023.",
+      gallery: [
+        { type: "image", src: "/img/Diseno22.jpg" },
+        { type: "image", src: "/img/Diseno21.jpg" },
+        { type: "image", src: "/img/Diseno18.jpg" },
+        { type: "image", src: "/img/Diseno19.jpg" },
+        { type: "image", src: "/img/Diseno20.jpg" },
+      ],
+      tags: ["Autodesk Maya", "Blender", "Textura UV"],
+    },
+    {
+      id: 12,
+      title: "Prototipo Web Interactivo",
+      category: "PROGRAMACIÓN",
+      description: "Diseño y desarrollo de prototipo web enfocado en la exploración informativa sobre una especie de ave, incorporando animaciones por scroll. 2025.",
+      gallery: [
+        { type: "video", src: "/video/Programacion03.mp4" },
+      ],
+      tags: ["HTML", "React", "JavaScript"],
+    },
+    {
+      id: 13,
+      title: "Cortometraje Animado",
+      category: "AUDIOVISUAL",
+      description: "Animación para Cortometraje Animado Amor en Z. Proyecto de Grado. 2024.",
+      gallery: [
+        { type: "youtube", src: "https://www.youtube.com/embed/KcvOl56ZsTQ?si=mhUnM1YK_6aAgZCe" },
+      ],
+      tags: ["After Effects", "Premiere Pro", "Illustrator"],
+    },
+    {
+      id: 14,
+      title: "Pixel Art Assets",
+      category: "DISEÑO",
+      description: "Diseño y desarrollo de assets visuales y funcionales para videojuego propio. Clase de Programación Avanzada. 2023.",
+      gallery: [
+        { type: "image", src: "/img/Diseno02.jpg" },
+      ],
+      tags: ["Illustrator", "Unity", "Pixel Art"],
+    },
+    {
+      id: 15,
+      title: "Videojuego Witch Way",
+      category: "PROGRAMACIÓN",
+      description: "Diseño y desarrollo de prototipo web enfocado en la exploración informativa sobre una especie de ave, incorporando animaciones por scroll. 2025.",
+      gallery: [
+        { type: "video", src: "/video/Programacion03.mp4" },
+      ],
+      tags: ["HTML", "React", "JavaScript"],
     },
   ],
   process: [
