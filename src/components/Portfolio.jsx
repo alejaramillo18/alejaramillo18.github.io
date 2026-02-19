@@ -744,7 +744,204 @@ function MediaCarousel({ gallery, alt, isHovered }) {
   );
 }
 
-function CursorGlow() {
+// --- Project Lightbox (fullscreen modal viewer) ---
+function ProjectLightbox({ project, isOpen, onClose }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [playingVideo, setPlayingVideo] = useState(null);
+  const videoRefs = useRef({});
+
+  const items = project?.gallery || [];
+  const hasMultiple = items.length > 1;
+
+  // Reset on open/project change
+  useEffect(() => {
+    setCurrentIndex(0);
+    setPlayingVideo(null);
+  }, [project]);
+
+  // Lock body scroll when open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && hasMultiple) setCurrentIndex((p) => (p === 0 ? items.length - 1 : p - 1));
+      if (e.key === "ArrowRight" && hasMultiple) setCurrentIndex((p) => (p === items.length - 1 ? 0 : p + 1));
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [isOpen, hasMultiple, items.length, onClose]);
+
+  // Pause video on slide change
+  useEffect(() => {
+    if (playingVideo !== null && playingVideo !== currentIndex) {
+      const vid = videoRefs.current[playingVideo];
+      if (vid) vid.pause();
+      setPlayingVideo(null);
+    }
+  }, [currentIndex, playingVideo]);
+
+  const handleVideoToggle = (index) => {
+    const vid = videoRefs.current[index];
+    if (!vid) return;
+    if (playingVideo === index) {
+      vid.pause();
+      setPlayingVideo(null);
+    } else {
+      vid.play();
+      setPlayingVideo(index);
+    }
+  };
+
+  const isEmbed = (type) => ["youtube", "vimeo", "drive"].includes(type);
+
+  if (!project) return null;
+
+  return (
+    <div
+      className={`lightbox-overlay ${isOpen ? "open" : ""}`}
+      onClick={onClose}
+    >
+      <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+        {/* Media area */}
+        <div className="lightbox-media">
+          {items.map((item, index) => {
+            const isActive = index === currentIndex;
+            return (
+              <div key={index} style={{
+                position: index === 0 ? "relative" : "absolute",
+                inset: 0,
+                opacity: isActive ? 1 : 0,
+                zIndex: isActive ? 2 : 0,
+                transition: "opacity 0.35s ease",
+                pointerEvents: isActive ? "auto" : "none",
+                width: "100%", height: "100%",
+              }}>
+                {item.type === "image" && (
+                  <img src={item.src} alt={`${project.title} ${index + 1}`} loading="lazy" />
+                )}
+
+                {item.type === "video" && (
+                  <>
+                    <video
+                      ref={(el) => { videoRefs.current[index] = el; }}
+                      src={item.src}
+                      preload="metadata"
+                      playsInline
+                      controls={playingVideo === index}
+                      onEnded={() => setPlayingVideo(null)}
+                      style={{ width: "100%", height: "100%", objectFit: "contain", background: "var(--bg-primary)" }}
+                    />
+                    {playingVideo !== index && (
+                      <div
+                        className="video-play-btn"
+                        onClick={() => handleVideoToggle(index)}
+                      >
+                        <div className="video-play-icon" style={{ width: "68px", height: "68px" }}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                            <polygon points="8,5 19,12 8,19" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {isEmbed(item.type) && (
+                  <iframe
+                    src={isActive ? item.src : ""}
+                    title={`${project.title} ${index + 1}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                )}
+              </div>
+            );
+          })}
+
+          {/* Close button */}
+          <button className="lightbox-close" onClick={onClose}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {/* Navigation arrows */}
+          {hasMultiple && (
+            <>
+              <button className="lightbox-nav prev" onClick={() => setCurrentIndex((p) => (p === 0 ? items.length - 1 : p - 1))}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <button className="lightbox-nav next" onClick={() => setCurrentIndex((p) => (p === items.length - 1 ? 0 : p + 1))}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Dots */}
+          {hasMultiple && (
+            <div className="lightbox-dots">
+              {items.map((_, index) => (
+                <button
+                  key={index}
+                  className={`lightbox-dot ${currentIndex === index ? "active" : ""}`}
+                  onClick={() => setCurrentIndex(index)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Project info */}
+        <div className="lightbox-info">
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+            <h3 style={{
+              fontFamily: "'Syne', sans-serif", fontSize: "24px", fontWeight: 700,
+              color: "var(--text-primary)", flex: 1,
+            }}>{project.title}</h3>
+            <span style={{
+              fontSize: "11px", fontWeight: 500, letterSpacing: "1.5px", padding: "5px 14px",
+              borderRadius: "50px", background: "rgba(90, 232, 214, 0.1)",
+              color: "var(--accent-cyan)", border: "1px solid rgba(90, 232, 214, 0.2)",
+              whiteSpace: "nowrap",
+            }}>{project.category}</span>
+            {hasMultiple && (
+              <span style={{
+                fontSize: "12px", color: "var(--text-muted)", whiteSpace: "nowrap",
+              }}>{currentIndex + 1} / {items.length}</span>
+            )}
+          </div>
+          <p style={{
+            fontSize: "15px", color: "var(--text-secondary)", lineHeight: 1.7, marginBottom: "16px",
+          }}>{project.description}</p>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {project.tags.map((tag) => (
+              <span key={tag} style={{
+                fontSize: "12px", padding: "5px 14px", borderRadius: "50px",
+                background: "rgba(123, 63, 191, 0.1)", color: "var(--text-secondary)",
+                border: "1px solid rgba(123, 63, 191, 0.15)",
+              }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const [pos, setPos] = useState({ x: -200, y: -200 });
   useEffect(() => {
     const onMove = (e) => setPos({ x: e.clientX, y: e.clientY });
@@ -755,6 +952,16 @@ function CursorGlow() {
 }
 
 // --- Navigation ---
+function CursorGlow() {
+  const [pos, setPos] = useState({ x: -200, y: -200 });
+  useEffect(() => {
+    const onMove = (e) => setPos({ x: e.clientX, y: e.clientY });
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
+  return <div className="cursor-glow" style={{ left: pos.x, top: pos.y }} />;
+}
+
 function Navigation({ activeSection }) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -1139,83 +1346,110 @@ function WorkSection() {
   const [ref, isVisible] = useScrollReveal();
   const [activeFilter, setActiveFilter] = useState("TODOS");
   const [hoveredId, setHoveredId] = useState(null);
+  const [lightboxProject, setLightboxProject] = useState(null);
 
   const categories = ["TODOS", "AUDIOVISUAL", "DISEÑO", "PROGRAMACIÓN"];
   const filtered = activeFilter === "TODOS"
     ? PORTFOLIO_DATA.projects
     : PORTFOLIO_DATA.projects.filter((p) => p.category === activeFilter);
 
+  const openLightbox = (project) => setLightboxProject(project);
+  const closeLightbox = () => setLightboxProject(null);
+
   return (
-    <section id="work" className="section" style={{ background: "linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)" }}>
-      <div className="section-inner">
-        <SectionTitle label="Portafolio" title="Mi Trabajo" />
-        <div ref={ref} className={`reveal ${isVisible ? "visible" : ""}`} style={{ display: "flex", gap: "12px", marginBottom: "48px", flexWrap: "wrap" }}>
-          {categories.map((cat) => (
-            <button key={cat} onClick={() => setActiveFilter(cat)} style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500,
-              padding: "10px 24px", borderRadius: "50px", cursor: "pointer", transition: "all 0.3s",
-              border: activeFilter === cat ? "1px solid var(--purple-main)" : "1px solid rgba(123, 63, 191, 0.2)",
-              background: activeFilter === cat ? "rgba(123, 63, 191, 0.15)" : "transparent",
-              color: activeFilter === cat ? "var(--purple-light)" : "var(--text-muted)", letterSpacing: "1px",
-            }}>{cat}</button>
-          ))}
-        </div>
-        <div className="projects-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "24px" }}>
-          {filtered.map((project, i) => (
-            <div key={project.id}
-              className={`reveal reveal-delay-${Math.min(i + 1, 6)} ${isVisible ? "visible" : ""}`}
-              onMouseEnter={() => setHoveredId(project.id)}
-              onMouseLeave={() => setHoveredId(null)}
-              style={{
-                borderRadius: "16px", overflow: "hidden", background: "var(--bg-card)",
-                border: "1px solid rgba(123, 63, 191, 0.12)", cursor: "pointer",
-                transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
-                transform: hoveredId === project.id ? "translateY(-4px)" : "translateY(0)",
-                boxShadow: hoveredId === project.id ? "0 20px 60px rgba(123, 63, 191, 0.15)" : "none",
-              }}>
-              <div style={{
-                aspectRatio: "16/10", background: "linear-gradient(135deg, var(--purple-deep), var(--bg-card-hover))",
-                display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
-              }}>
-                {(project.gallery && project.gallery.length > 0) ? (
-                  <MediaCarousel
-                    gallery={project.gallery}
-                    alt={project.title}
-                    isHovered={hoveredId === project.id}
-                  />
-                ) : (
-                  <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
-                    <div style={{ fontSize: "36px", marginBottom: "8px", transition: "transform 0.4s", transform: hoveredId === project.id ? "scale(1.15)" : "scale(1)" }}>
-                      {project.category === "AUDIOVISUAL" ? "🎬" : project.category === "DISEÑO" ? "🎨" : "💻"}
+    <>
+      <ProjectLightbox
+        project={lightboxProject}
+        isOpen={lightboxProject !== null}
+        onClose={closeLightbox}
+      />
+      <section id="work" className="section" style={{ background: "linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)" }}>
+        <div className="section-inner">
+          <SectionTitle label="Portafolio" title="Mi Trabajo" />
+          <div ref={ref} className={`reveal ${isVisible ? "visible" : ""}`} style={{ display: "flex", gap: "12px", marginBottom: "48px", flexWrap: "wrap" }}>
+            {categories.map((cat) => (
+              <button key={cat} onClick={() => setActiveFilter(cat)} style={{
+                fontFamily: "'DM Sans', sans-serif", fontSize: "13px", fontWeight: 500,
+                padding: "10px 24px", borderRadius: "50px", cursor: "pointer", transition: "all 0.3s",
+                border: activeFilter === cat ? "1px solid var(--purple-main)" : "1px solid rgba(123, 63, 191, 0.2)",
+                background: activeFilter === cat ? "rgba(123, 63, 191, 0.15)" : "transparent",
+                color: activeFilter === cat ? "var(--purple-light)" : "var(--text-muted)", letterSpacing: "1px",
+              }}>{cat}</button>
+            ))}
+          </div>
+          <div className="projects-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))", gap: "24px" }}>
+            {filtered.map((project, i) => (
+              <div key={project.id}
+                className={`reveal reveal-delay-${Math.min(i + 1, 6)} project-card ${isVisible ? "visible" : ""}`}
+                onMouseEnter={() => setHoveredId(project.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                onClick={() => openLightbox(project)}
+                style={{
+                  borderRadius: "16px", overflow: "hidden", background: "var(--bg-card)",
+                  border: "1px solid rgba(123, 63, 191, 0.12)", cursor: "pointer",
+                  transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                  transform: hoveredId === project.id ? "translateY(-4px)" : "translateY(0)",
+                  boxShadow: hoveredId === project.id ? "0 20px 60px rgba(123, 63, 191, 0.15)" : "none",
+                }}>
+                <div style={{
+                  aspectRatio: "16/10", background: "linear-gradient(135deg, var(--purple-deep), var(--bg-card-hover))",
+                  display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden",
+                }}>
+                  {(project.gallery && project.gallery.length > 0) ? (
+                    <MediaCarousel
+                      gallery={project.gallery}
+                      alt={project.title}
+                      isHovered={hoveredId === project.id}
+                    />
+                  ) : (
+                    <div style={{ textAlign: "center", color: "var(--text-muted)" }}>
+                      <div style={{ fontSize: "36px", marginBottom: "8px", transition: "transform 0.4s", transform: hoveredId === project.id ? "scale(1.15)" : "scale(1)" }}>
+                        {project.category === "AUDIOVISUAL" ? "🎬" : project.category === "DISEÑO" ? "🎨" : "💻"}
+                      </div>
+                      <span style={{ fontSize: "12px", letterSpacing: "1px" }}>IMAGEN / VIDEO</span>
                     </div>
-                    <span style={{ fontSize: "12px", letterSpacing: "1px" }}>IMAGEN / VIDEO</span>
+                  )}
+                  <span style={{
+                    position: "absolute", top: "16px", left: "16px", fontSize: "11px", fontWeight: 500,
+                    letterSpacing: "1.5px", padding: "6px 14px", borderRadius: "50px",
+                    background: "rgba(10, 0, 18, 0.7)", backdropFilter: "blur(10px)",
+                    color: "var(--accent-cyan)", border: "1px solid rgba(90, 232, 214, 0.2)",
+                    zIndex: 4,
+                  }}>{project.category}</span>
+
+                  {/* Expand button */}
+                  <button
+                    className="lightbox-expand-btn"
+                    onClick={(e) => { e.stopPropagation(); openLightbox(project); }}
+                    title="Ver en grande"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 3 21 3 21 9" />
+                      <polyline points="9 21 3 21 3 15" />
+                      <line x1="21" y1="3" x2="14" y2="10" />
+                      <line x1="3" y1="21" x2="10" y2="14" />
+                    </svg>
+                  </button>
+                </div>
+                <div style={{ padding: "24px" }}>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>{project.title}</h3>
+                  <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "16px" }}>{project.description}</p>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {project.tags.map((tag) => (
+                      <span key={tag} style={{
+                        fontSize: "12px", padding: "4px 12px", borderRadius: "50px",
+                        background: "rgba(123, 63, 191, 0.08)", color: "var(--text-secondary)",
+                        border: "1px solid rgba(123, 63, 191, 0.1)",
+                      }}>{tag}</span>
+                    ))}
                   </div>
-                )}
-                <span style={{
-                  position: "absolute", top: "16px", left: "16px", fontSize: "11px", fontWeight: 500,
-                  letterSpacing: "1.5px", padding: "6px 14px", borderRadius: "50px",
-                  background: "rgba(10, 0, 18, 0.7)", backdropFilter: "blur(10px)",
-                  color: "var(--accent-cyan)", border: "1px solid rgba(90, 232, 214, 0.2)",
-                }}>{project.category}</span>
-              </div>
-              <div style={{ padding: "24px" }}>
-                <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: "20px", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>{project.title}</h3>
-                <p style={{ fontSize: "14px", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "16px" }}>{project.description}</p>
-                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                  {project.tags.map((tag) => (
-                    <span key={tag} style={{
-                      fontSize: "12px", padding: "4px 12px", borderRadius: "50px",
-                      background: "rgba(123, 63, 191, 0.08)", color: "var(--text-secondary)",
-                      border: "1px solid rgba(123, 63, 191, 0.1)",
-                    }}>{tag}</span>
-                  ))}
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
