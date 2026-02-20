@@ -45,6 +45,8 @@ const PORTFOLIO_DATA = {
     { name: "SQL", level: 75, category: "Analitica e innovacion tecnologica" },
     { name: "Power BI", level: 70, category: "Analitica e innovacion tecnologica" },
     { name: "Machine Learning", level: 50, category: "Analitica e innovacion tecnologica" },
+    { name: "Realidad Virtual", level: 75, category: "Analitica e innovacion tecnologica" },
+    { name: "Realidad Aumentada", level: 85, category: "Analitica e innovacion tecnologica" },
   ],
   // MEDIA: Cada proyecto soporta múltiples medios en un carrusel.
   // Usa el campo "gallery" como array. Cada item puede ser:
