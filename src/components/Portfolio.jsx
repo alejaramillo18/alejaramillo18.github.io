@@ -288,7 +288,7 @@ const PORTFOLIO_DATA = {
       category: "AUDIOVISUAL",
       description: "Grabación y edición de documental, construcción visual y narrativa del proyecto para clase de Diseño Sonoro. 2025.",
       gallery: [
-        { type: "youtube", src: "https://www.youtube.com/embed/dgxy7djkfy8?si=TXOY24CEghhMhSTR" },
+        { type: "drive", src: "https://drive.google.com/file/d/1mTZg8tcrpcALkFFTGpV4lQVi31mICiKk/view?usp=drive_link" },
       ],
       tags: ["Premiere Pro", "Davinci Resolve", "Colorimetría"],
     },
