@@ -181,6 +181,7 @@ const PORTFOLIO_DATA = {
       category: "DISEÑO",
       description: "Creación de modelos 3D con aplicación de texturas y materiales para lograr acabados realistas y coherentes con el concepto visual del proyecto. 2023.",
       gallery: [
+        { type: "image", src: "/img/Diseno32.png" },
         { type: "image", src: "/img/Diseno22.jpg" },
         { type: "image", src: "/img/Diseno21.jpg" },
         { type: "image", src: "/img/Diseno18.jpg" },
