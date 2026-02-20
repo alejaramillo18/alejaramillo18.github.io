@@ -388,7 +388,7 @@ const PORTFOLIO_DATA = {
     },
     {
       step: "03",
-      title: "Diseño & Prototipo",
+      title: "Diseño y Prototipo",
       description: "Creo wireframes, mockups y prototipos interactivos para validar ideas.",
       icon: "✏️",
     },
